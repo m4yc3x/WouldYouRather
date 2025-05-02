@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Would You Rather</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Would You Rather?</h1>
+        </header>
+        
+        <main>
+            <!-- Main Menu -->
+            <div id="main-menu" class="screen active">
+                <div class="menu-container">
+                    <h2>Ready to Play?</h2>
+                    <div class="button-container">
+                        <button id="new-game-btn" class="btn primary-btn">New Game</button>
+                        <button id="past-games-btn" class="btn secondary-btn">Past Games</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Player Entry Screen -->
+            <div id="player-entry" class="screen">
+                <div class="player-form">
+                    <h2>Add Players</h2>
+                    <div class="input-group">
+                        <input type="text" id="player-name" placeholder="Enter player name">
+                        <button id="add-player-btn" class="btn primary-btn">Add</button>
+                    </div>
+                    <div id="players-list" class="players-container"></div>
+                    <button id="start-game-btn" class="btn primary-btn" disabled>Start Game</button>
+                </div>
+            </div>
+            
+            <!-- Game Screen -->
+            <div id="game-screen" class="screen">
+                <div class="question-container">
+                    <h2 id="question-text">Would you rather...</h2>
+                </div>
+                
+                <div class="options-container">
+                    <div id="option-a" class="option-box">
+                        <h3 id="option-a-text">Option A</h3>
+                        <div class="player-grid" id="option-a-players"></div>
+                    </div>
+                    
+                    <div id="option-b" class="option-box">
+                        <h3 id="option-b-text">Option B</h3>
+                        <div class="player-grid" id="option-b-players"></div>
+                    </div>
+                </div>
+                
+                <div id="player-deck" class="player-deck"></div>
+                
+                <div class="controls">
+                    <button id="finish-question-btn" class="btn primary-btn" disabled>Complete Question</button>
+                </div>
+            </div>
+            
+            <!-- Results Modal -->
+            <div id="results-modal" class="modal">
+                <div class="modal-content">
+                    <h2>Results</h2>
+                    <div id="question-results"></div>
+                    <button id="next-question-btn" class="btn primary-btn">Next Question</button>
+                </div>
+            </div>
+            
+            <!-- Past Games Screen -->
+            <div id="past-games" class="screen">
+                <h2>Past Games</h2>
+                <div id="past-games-list" class="past-games-container"></div>
+                <button id="back-to-menu-btn" class="btn secondary-btn">Back to Menu</button>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Would You Rather - A Fun Decision Game</p>
+        </footer>
+    </div>
+    
+    <script src="./scripts/common.js"></script>
+</body>
+</html>
