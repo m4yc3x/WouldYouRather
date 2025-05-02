@@ -25,6 +25,7 @@ const elements = {
     startGameBtn: document.getElementById('start-game-btn'),
     
     // Game Screen
+    questionText: document.getElementById('question-text'),
     optionAText: document.getElementById('option-a-text'),
     optionBText: document.getElementById('option-b-text'),
     optionAPlayers: document.getElementById('option-a-players'),
@@ -189,7 +190,8 @@ function showQuestion() {
     const game = gameData.currentGame;
     const currentQuestion = game.questions[game.currentQuestionIndex];
     
-    // Display options
+    // Display question and options
+    elements.questionText.textContent = "Would you rather...";
     elements.optionAText.textContent = currentQuestion.optionA;
     elements.optionBText.textContent = currentQuestion.optionB;
     
@@ -405,6 +407,7 @@ function completeQuestion() {
     // Save results
     game.results.push({
         questionId: currentQuestion.id,
+        questionText: "Would you rather...",
         optionA: currentQuestion.optionA,
         optionB: currentQuestion.optionB,
         optionAPlayerIds,
@@ -424,6 +427,7 @@ function showResults() {
     
     // Build results HTML
     let resultsHTML = `
+        <div class="result-question">${currentResult.questionText}</div>
         <div class="result-options">
             <div class="result-option">
                 <h4>${currentResult.optionA}</h4>
@@ -591,6 +595,7 @@ function viewPastGame(gameId) {
             <div class="past-question">
                 <div class="past-question-header">
                     <span class="question-number">Question ${index + 1}</span>
+                    <h4>${result.questionText}</h4>
                 </div>
                 
                 <div class="past-options">
