@@ -60,6 +60,7 @@
                 
                 <div class="controls">
                     <button id="finish-question-btn" class="btn primary-btn" disabled>Complete Question</button>
+                    <button id="skip-question-btn" class="btn secondary-btn">Skip Question</button>
                 </div>
             </div>
             
@@ -76,7 +77,10 @@
             <div id="past-games" class="screen">
                 <h2>Past Games</h2>
                 <div id="past-games-list" class="past-games-container"></div>
-                <button id="back-to-menu-btn" class="btn secondary-btn">Back to Menu</button>
+                <div class="past-games-controls">
+                    <button id="back-to-menu-btn" class="btn secondary-btn">Back to Menu</button>
+                    <button id="clear-all-games-btn" class="btn danger-btn">Clear All Games</button>
+                </div>
             </div>
         </main>
         
@@ -85,6 +89,7 @@
         </footer>
     </div>
     
+    <script src="./scripts/data.js"></script>
     <script src="./scripts/common.js"></script>
 </body>
 </html>

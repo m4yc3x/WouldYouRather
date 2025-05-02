@@ -95,6 +95,16 @@ main {
     transform: translateY(-3px);
 }
 
+.danger-btn {
+    background-color: #ff6b6b;
+    color: var(--light-text);
+}
+
+.danger-btn:hover {
+    background-color: #ff5252;
+    transform: translateY(-3px);
+}
+
 .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -192,15 +202,6 @@ main {
 }
 
 /* Game Screen */
-.question-container {
-    text-align: center;
-    margin-bottom: 30px;
-    background-color: white;
-    padding: 20px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-}
-
 .options-container {
     display: flex;
     flex-wrap: wrap;
@@ -287,6 +288,7 @@ main {
 .controls {
     display: flex;
     justify-content: center;
+    gap: 15px;
     margin-top: 20px;
 }
 
@@ -320,14 +322,6 @@ main {
 }
 
 /* Results Modal Styles */
-.result-question {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-    text-align: center;
-    color: var(--dark-text);
-}
-
 .result-options {
     display: flex;
     flex-wrap: wrap;
@@ -393,6 +387,16 @@ main {
     font-size: 1.1rem;
 }
 
+.skipped-info {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    font-size: 1rem;
+    border-left: 4px solid #ffeeba;
+}
+
 .past-game-players {
     margin-bottom: 20px;
 }
@@ -438,7 +442,6 @@ main {
     padding: 5px 10px;
     border-radius: 15px;
     font-size: 0.8rem;
-    margin-bottom: 5px;
 }
 
 .past-question h4 {
@@ -501,9 +504,11 @@ main {
     font-size: 0.9rem;
 }
 
-.past-game-details .btn {
-    margin-top: 10px;
-    align-self: center;
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 /* Custom scrollbar for past questions container */
@@ -555,6 +560,19 @@ main {
 .past-game-card p {
     margin-bottom: 15px;
     color: var(--dark-text);
+}
+
+.past-games-controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+@media (max-width: 500px) {
+    .past-games-controls {
+        flex-direction: column;
+    }
 }
 
 /* Footer Styles */

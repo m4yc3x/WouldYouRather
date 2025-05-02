@@ -4,40 +4,6 @@ let gameData = {
     savedGames: []
 };
 
-// Sample questions for the game
-const questions = [
-    {
-        id: 1,
-        text: "Would you rather...",
-        optionA: "Be able to fly",
-        optionB: "Be invisible"
-    },
-    {
-        id: 2,
-        text: "Would you rather...",
-        optionA: "Live without internet",
-        optionB: "Live without AC/heating"
-    },
-    {
-        id: 3,
-        text: "Would you rather...",
-        optionA: "Be a famous actor",
-        optionB: "Be a famous musician"
-    },
-    {
-        id: 4, 
-        text: "Would you rather...",
-        optionA: "Read minds",
-        optionB: "See the future"
-    },
-    {
-        id: 5,
-        text: "Would you rather...",
-        optionA: "Have unlimited money",
-        optionB: "Have unlimited time"
-    }
-];
-
 // DOM Elements
 const screens = {
     mainMenu: document.getElementById('main-menu'),
@@ -59,13 +25,13 @@ const elements = {
     startGameBtn: document.getElementById('start-game-btn'),
     
     // Game Screen
-    questionText: document.getElementById('question-text'),
     optionAText: document.getElementById('option-a-text'),
     optionBText: document.getElementById('option-b-text'),
     optionAPlayers: document.getElementById('option-a-players'),
     optionBPlayers: document.getElementById('option-b-players'),
     playerDeck: document.getElementById('player-deck'),
     finishQuestionBtn: document.getElementById('finish-question-btn'),
+    skipQuestionBtn: document.getElementById('skip-question-btn'),
     
     // Results Modal
     questionResults: document.getElementById('question-results'),
@@ -115,12 +81,14 @@ function setupEventListeners() {
     
     // Game Screen
     elements.finishQuestionBtn.addEventListener('click', completeQuestion);
+    elements.skipQuestionBtn.addEventListener('click', skipQuestion);
     
     // Results Modal
     elements.nextQuestionBtn.addEventListener('click', nextQuestion);
     
     // Past Games
     elements.backToMenuBtn.addEventListener('click', () => showScreen('mainMenu'));
+    document.getElementById('clear-all-games-btn').addEventListener('click', clearAllGames);
 }
 
 // Screen navigation
@@ -221,8 +189,7 @@ function showQuestion() {
     const game = gameData.currentGame;
     const currentQuestion = game.questions[game.currentQuestionIndex];
     
-    // Display question and options
-    elements.questionText.textContent = currentQuestion.text;
+    // Display options
     elements.optionAText.textContent = currentQuestion.optionA;
     elements.optionBText.textContent = currentQuestion.optionB;
     
@@ -266,6 +233,9 @@ function handleDragEnd(e) {
 
 // Handle touch start for mobile
 function handleTouchStart(e) {
+    // Only handle single-touch events
+    if (e.touches.length !== 1) return;
+    
     e.preventDefault();
     draggedElement = this;
     draggedElement.classList.add('dragging');
@@ -283,6 +253,7 @@ function handleTouchStart(e) {
     clone.style.position = 'fixed';
     clone.style.left = rect.left + 'px';
     clone.style.top = rect.top + 'px';
+    clone.style.width = rect.width + 'px';
     clone.style.opacity = '0.8';
     clone.style.pointerEvents = 'none';
     clone.style.zIndex = '1000';
@@ -291,6 +262,9 @@ function handleTouchStart(e) {
 
 // Handle touch move for mobile
 function handleTouchMove(e) {
+    // Only handle single-touch events
+    if (e.touches.length !== 1) return;
+    
     e.preventDefault();
     if (!draggedElement) return;
     
@@ -431,7 +405,6 @@ function completeQuestion() {
     // Save results
     game.results.push({
         questionId: currentQuestion.id,
-        questionText: currentQuestion.text,
         optionA: currentQuestion.optionA,
         optionB: currentQuestion.optionB,
         optionAPlayerIds,
@@ -451,7 +424,6 @@ function showResults() {
     
     // Build results HTML
     let resultsHTML = `
-        <div class="result-question">${currentResult.questionText}</div>
         <div class="result-options">
             <div class="result-option">
                 <h4>${currentResult.optionA}</h4>
@@ -511,12 +483,17 @@ function nextQuestion() {
 function endGame() {
     const game = gameData.currentGame;
     
+    // Check if any questions were skipped
+    const skippedQuestions = game.questions.length - game.results.length;
+    
     // Save completed game
     gameData.savedGames.push({
         id: game.id,
         date: game.date,
         players: game.players,
-        results: game.results
+        results: game.results,
+        totalQuestions: game.questions.length,
+        skippedQuestions: skippedQuestions
     });
     
     gameData.currentGame = null;
@@ -526,7 +503,11 @@ function endGame() {
     showScreen('mainMenu');
     
     // Show a completion alert
-    alert('Game completed! Check "Past Games" to see results.');
+    if (skippedQuestions > 0) {
+        alert(`Game completed! ${skippedQuestions} question(s) were skipped. Check "Past Games" to see results.`);
+    } else {
+        alert('Game completed! Check "Past Games" to see results.');
+    }
 }
 
 // Show past games screen
@@ -539,11 +520,13 @@ function showPastGames() {
     } else {
         gameData.savedGames.forEach(game => {
             const date = new Date(game.date).toLocaleDateString();
+            const skippedText = game.skippedQuestions > 0 ? ` (${game.skippedQuestions} skipped)` : '';
+            
             const gameCard = document.createElement('div');
             gameCard.className = 'past-game-card';
             gameCard.innerHTML = `
                 <h3>Game from ${date}</h3>
-                <p>${game.players.length} players · ${game.results.length} questions</p>
+                <p>${game.players.length} players · ${game.results.length} questions${skippedText}</p>
                 <button class="btn secondary-btn view-game-btn">View Details</button>
             `;
             
@@ -572,11 +555,17 @@ function viewPastGame(gameId) {
     // Format date
     const date = new Date(game.date).toLocaleDateString();
     
+    // Create skipped questions text if any
+    const skippedText = game.skippedQuestions > 0 
+        ? `<p class="skipped-info">${game.skippedQuestions} question(s) were skipped</p>` 
+        : '';
+    
     // Create modal content
     let gameDetailsHTML = `
         <div class="modal-content past-game-details">
             <h2>Game from ${date}</h2>
-            <p>${game.players.length} players participated</p>
+            <p>${game.players.length} players participated · ${game.results.length} of ${game.totalQuestions || game.results.length} questions answered</p>
+            ${skippedText}
             
             <div class="past-game-players">
                 <h3>Players</h3>
@@ -602,7 +591,6 @@ function viewPastGame(gameId) {
             <div class="past-question">
                 <div class="past-question-header">
                     <span class="question-number">Question ${index + 1}</span>
-                    <h4>${result.questionText}</h4>
                 </div>
                 
                 <div class="past-options">
@@ -657,7 +645,10 @@ function viewPastGame(gameId) {
     gameDetailsHTML += `
             </div>
             
-            <button id="close-past-game-btn" class="btn primary-btn">Close</button>
+            <div class="modal-actions">
+                <button id="close-past-game-btn" class="btn primary-btn">Close</button>
+                <button id="delete-past-game-btn" class="btn danger-btn">Delete Game</button>
+            </div>
         </div>
     `;
     
@@ -674,6 +665,17 @@ function viewPastGame(gameId) {
         }, 300);
     });
     
+    // Add delete button functionality
+    document.getElementById('delete-past-game-btn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to delete this game? This action cannot be undone.')) {
+            deletePastGame(gameId);
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.remove();
+            }, 300);
+        }
+    });
+    
     // Add click outside to close
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -683,6 +685,58 @@ function viewPastGame(gameId) {
             }, 300);
         }
     });
+}
+
+// Delete a past game
+function deletePastGame(gameId) {
+    // Find the game index
+    const gameIndex = gameData.savedGames.findIndex(g => g.id === gameId);
+    
+    if (gameIndex !== -1) {
+        // Remove from array
+        gameData.savedGames.splice(gameIndex, 1);
+        
+        // Save updated data
+        saveGameData();
+        
+        // Refresh the past games list
+        showPastGames();
+    }
+}
+
+// Clear all past games
+function clearAllGames() {
+    if (gameData.savedGames.length === 0) {
+        alert('There are no saved games to clear.');
+        return;
+    }
+    
+    if (confirm('Are you sure you want to delete ALL saved games? This action cannot be undone.')) {
+        // Clear saved games array
+        gameData.savedGames = [];
+        
+        // Save updated data
+        saveGameData();
+        
+        // Refresh the past games list
+        showPastGames();
+    }
+}
+
+// Skip the current question without saving
+function skipQuestion() {
+    const game = gameData.currentGame;
+    
+    if (confirm('Are you sure you want to skip this question? Player selections will not be saved.')) {
+        // Move to next question without saving results
+        game.currentQuestionIndex++;
+        
+        if (game.currentQuestionIndex < game.questions.length) {
+            showQuestion();
+        } else {
+            endGame();
+        }
+    }
 }
 
 // Initialize the app when DOM is loaded
