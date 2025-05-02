@@ -52,18 +52,30 @@ let touchOffsetY = 0;
 function init() {
     loadGameData();
     setupEventListeners();
+    
+    // Always start at the main menu
+    showScreen('mainMenu');
 }
 
 // Load saved game data from localStorage
 function loadGameData() {
     const savedData = localStorage.getItem('wouldYouRatherGameData');
     if (savedData) {
-        gameData = JSON.parse(savedData);
+        // Parse the saved data
+        const parsedData = JSON.parse(savedData);
+        
+        // Only keep the savedGames array, discard any current game
+        gameData.savedGames = parsedData.savedGames || [];
+        gameData.currentGame = null;
     }
+    
+    // Save the cleared state back to localStorage
+    saveGameData();
 }
 
 // Save game data to localStorage
 function saveGameData() {
+    // Simply save the entire game data object to localStorage
     localStorage.setItem('wouldYouRatherGameData', JSON.stringify(gameData));
 }
 
@@ -414,6 +426,7 @@ function completeQuestion() {
         optionBPlayerIds
     });
     
+    // Save the current game state
     saveGameData();
     
     // Show results modal
@@ -476,6 +489,9 @@ function nextQuestion() {
     // Move to next question or end game
     game.currentQuestionIndex++;
     
+    // Save the current game state with the updated index
+    saveGameData();
+    
     if (game.currentQuestionIndex < game.questions.length) {
         showQuestion();
     } else {
@@ -490,17 +506,18 @@ function endGame() {
     // Check if any questions were skipped
     const skippedQuestions = game.questions.length - game.results.length;
     
-    // Save completed game
-    gameData.savedGames.push({
-        id: game.id,
-        date: game.date,
-        players: game.players,
-        results: game.results,
-        totalQuestions: game.questions.length,
-        skippedQuestions: skippedQuestions
-    });
+    // Add completion data
+    game.totalQuestions = game.questions.length;
+    game.skippedQuestions = skippedQuestions;
+    game.completionDate = new Date().toISOString();
     
+    // Save completed game to savedGames
+    gameData.savedGames.push({...game});
+    
+    // Clear the current game
     gameData.currentGame = null;
+    
+    // Save the updated game data
     saveGameData();
     
     // Show main menu
@@ -523,7 +540,7 @@ function showPastGames() {
         elements.pastGamesList.innerHTML = '<p>No past games found.</p>';
     } else {
         gameData.savedGames.forEach(game => {
-            const date = new Date(game.date).toLocaleDateString();
+            const date = new Date(game.completionDate || game.date).toLocaleDateString();
             const skippedText = game.skippedQuestions > 0 ? ` (${game.skippedQuestions} skipped)` : '';
             
             const gameCard = document.createElement('div');
@@ -735,6 +752,9 @@ function skipQuestion() {
     if (confirm('Are you sure you want to skip this question? Player selections will not be saved.')) {
         // Move to next question without saving results
         game.currentQuestionIndex++;
+        
+        // Save the current game state with the updated index
+        saveGameData();
         
         if (game.currentQuestionIndex < game.questions.length) {
             showQuestion();
